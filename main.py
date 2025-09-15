@@ -12,7 +12,8 @@ import os
 import pystray
 from PIL import Image, ImageDraw
 
-
+import sys
+print("✅ TaskManager started successfully!", file=sys.stderr)
 def decode_recurrence_days(bitmask):
     """
     Convert the recurrence_days integer (bitmask) into a list of weekday strings.
@@ -148,10 +149,11 @@ tree.heading("Status", text="Status")
 tree.pack(fill="both", expand=True)
 
 # Configure tags for background colors
-tree.tag_configure("Not Started", background="#EB8673")
-tree.tag_configure("In Progress", background="#EDE17B")
-tree.tag_configure("Completed", background="#7BED86")
-tree.tag_configure("Graded", background="#7BE2ED")
+# Configure tags for background colors (matching View by Class)
+tree.tag_configure("Not Started", background="#ff7171")
+tree.tag_configure("In Progress", background="#fffacd")
+tree.tag_configure("Completed", background="#d0f0c0")
+tree.tag_configure("Graded", background="#add8e6")
 
 # Load existing tasks from database and print them
 # NOTE: Old tasks in DB do not have 'Course' or 'Status'; only show what is available.
@@ -374,7 +376,7 @@ def open_view_by_class_window():
     class_tree.heading("Status", text="Status")
     class_tree.pack(fill="both", expand=True)
 
-    class_tree.tag_configure("Not Started", background="#f0f0f0")
+    class_tree.tag_configure("Not Started", background="#ff7171")
     class_tree.tag_configure("In Progress", background="#fffacd")
     class_tree.tag_configure("Completed", background="#d0f0c0")
     class_tree.tag_configure("Graded", background="#add8e6")
@@ -384,9 +386,10 @@ def open_view_by_class_window():
             class_tree.delete(item)
         for item in tree.get_children():
             vals = tree.item(item, "values")
-            name, cls, start, due, status, recurrence = vals
-            if cls == selected_class.get():
-                class_tree.insert("", tk.END, values=(name, start, due, status), tags=(status,))
+            if len(vals) >= 5:
+                name, cls, start, due, status = vals[:5]
+                if cls == selected_class.get():
+                    class_tree.insert("", tk.END, values=(name, start, due, status), tags=(status,))
 
     selected_class.trace_add("write", update_tree)
     update_tree()
